@@ -35,7 +35,12 @@ app.ws('/', function(ws, req) {
 
     ws.on('message', function(message) {
         var jsonMessage = JSON.parse(message);
-        jsonMessage.clientId = frontendId + '-' + req.connectionId;
+
+        if (jsonMessage.params === undefined) {
+            jsonMessage.params = {};
+        }
+        jsonMessage.params.clientId = frontendId + '-' + req.connectionId;
+
         request({
             url: frontendApiHost + ':' + frontendApiPort,
             method: 'POST',
