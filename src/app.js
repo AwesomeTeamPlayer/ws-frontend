@@ -28,6 +28,8 @@ app.ws('/', function(ws, req) {
 
     req.connectionId = getUniqueConnectionId();
 
+    ws.send('Hello world!');
+
     connections[req.connectionId] = {
         req: req,
         ws: ws
@@ -52,6 +54,18 @@ app.ws('/', function(ws, req) {
 
     ws.on('close', function(msg) {
         delete connections[req.connectionId];
+
+        request({
+            url: frontendApiHost + ':' + frontendApiPort,
+            method: 'POST',
+            data: {
+                "jsonrpc": "2.0",
+                "method":"notificationRemoveAllListenersByClientId",
+                "params": {
+                    clientId: frontendId + '-' + req.connectionId
+                }
+            }
+        }, function(err, res, body) {});
     });
 });
 
